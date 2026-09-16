@@ -1366,7 +1366,7 @@ with st.container(border=True):
  #       <h3 style="
   #          margin:0 0 6px 0;
  #           color:{TEXT_DARK};">
-            📡 Operational Recommendation
+  #          📡 Operational Recommendation
  #       </h3>
 
   #      <p style="
@@ -1374,7 +1374,7 @@ with st.container(border=True):
    #         font-size:16px;
      #       font-weight:700;
     #        color:{rec_color};">
-            {recommendation}
+       #     {recommendation}
      #   </p>
 
       #  <p style="
@@ -1388,7 +1388,7 @@ with st.container(border=True):
    # </div>
  #   """,
  #   unsafe_allow_html=True
-)
+#)
 
 
 # ------------------------------------------------------------
