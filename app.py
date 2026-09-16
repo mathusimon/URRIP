@@ -1416,10 +1416,8 @@ st.dataframe(
 # ------------------------------------------------------------
 
 # Extract distinct actions and recommendations from analysis results
-op_action = get_operational_action(scenario, analysis["routes"])
 op_recommendation = get_operational_recommendation(scenario, analysis["routes"])
-
-col_act, col_rec = st.columns(1)
+(col_act,) = st.columns([1])
 
 with col_rec:
     st.subheader("🗺️ Operational Recommendation")
