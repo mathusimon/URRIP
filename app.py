@@ -420,42 +420,42 @@ def calculate_route_flood_exposure(
 
 
 # ------------------------------------------------------------
-# ROUTE RECOMMENDATION
+# ROUTE RECOMMENDATION (EXACT ROUTE ASSIGNMENT)
 # ------------------------------------------------------------
 
 def route_recommendation(
     routes_df,
     scenario
 ):
-    """Same recommendation logic as the final notebook dashboard."""
+    """Explicitly names the target route number for operational guidance."""
 
     if routes_df.empty:
         return "NO ROUTE AVAILABLE"
 
+    # For non-flood scenarios, explicitly specify Route 1 (fastest path)
     if scenario != "Flood + Traffic":
-        return "USE FASTEST ROUTE"
+        best_route_num = int(routes_df.iloc[0]["route_number"])
+        return f"DISPATCH VIA ROUTE {best_route_num} (FASTEST)"
 
+    # Under Flood + Traffic, evaluate flood exposure thresholds
     viable_routes = routes_df[
         routes_df["flood_percentage"] <= 20
     ].copy()
 
     if not viable_routes.empty:
-
         best_viable = (
             viable_routes
             .sort_values("time_sec")
             .iloc[0]
         )
+        route_num = int(best_viable["route_number"])
 
-        if best_viable["route_number"] == 1:
-            return "USE FASTEST VIABLE ROUTE"
+        if route_num == 1:
+            return f"DISPATCH VIA ROUTE {route_num} (MINIMAL FLOOD EXPOSURE)"
 
-        return (
-            f"REROUTE VIA ROUTE "
-            f"{int(best_viable['route_number'])}"
-        )
+        return f"REROUTE VIA ROUTE {route_num} (BYPASSES FLOODED SECTIONS)"
 
-    return "CAUTION: ALL ROUTES FLOOD-EXPOSED"
+    return "CAUTION: ALL ALTERNATIVE ROUTES ARE HEAVILY FLOOD-EXPOSED"
 
 
 # ------------------------------------------------------------
@@ -829,7 +829,7 @@ st.markdown(
             font-weight:700;
             letter-spacing:1.5px;
             margin-bottom:4px;">
-            URIP · URBAN EMERGENCY INTELLIGENCE
+            URIP · URBAN RESILIENCE INTELLIGENCE PLATFORM
         </div>
         <h1 style="
             margin:0;
@@ -851,7 +851,7 @@ st.markdown(
 
 
 # ------------------------------------------------------------
-# CONTROLS
+# CONTROLS & SESSION STATE
 # ------------------------------------------------------------
 
 incident_ids = sorted(
@@ -860,9 +860,7 @@ incident_ids = sorted(
     .tolist()
 )
 
-col1, col2, col3 = st.columns(
-    [1, 1.5, 1]
-)
+col1, col2, col3 = st.columns([1, 1.5, 1])
 
 with col1:
     incident_id = st.selectbox(
@@ -887,26 +885,27 @@ with col2:
     )
 
 with col3:
+    st.write("") # Spacer to align button vertically with selectboxes
+    st.write("")
     analyse = st.button(
         "Analyse Incident",
         type="primary",
         use_container_width=True
     )
 
-
-# Run automatically on first load and whenever controls change.
-analysis = analyse_scenario(
-    int(incident_id),
-    scenario,
-    k_routes=3
-)
-
-if analysis is None:
-
-    st.error(
-        "No viable route or facility found for this scenario."
+# Run analysis ONLY when the button is pressed
+if analyse:
+    st.session_state["analysis"] = analyse_scenario(
+        int(incident_id),
+        scenario,
+        k_routes=3
     )
 
+# Retrieve results from session state
+analysis = st.session_state.get("analysis", None)
+
+if analysis is None:
+    st.info("👈 Select an incident and scenario, then click **Analyse Incident** to compute emergency routes.")
     st.stop()
 
 
