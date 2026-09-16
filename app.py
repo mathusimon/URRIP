@@ -851,7 +851,7 @@ st.markdown(
 
 
 # ------------------------------------------------------------
-# CONTROLS & SESSION STATE
+# CONTROLS & SESSION STATE (STRICT BUTTON-ONLY TRIGGER)
 # ------------------------------------------------------------
 
 # Build Incident list with a placeholder
@@ -897,33 +897,33 @@ with col3:
         use_container_width=True
     )
 
-# Assign variables safely
-incident_id = int(selected_inc_str) if selected_inc_str != "Select Incident..." else None
-scenario = selected_scenario if selected_scenario != "Select Scenario..." else None
-
-# Handle analysis execution on button press
+# 1. Update active analysis and parameters ONLY when the button is explicitly pressed
 if analyse:
-    if incident_id is None or scenario is None:
+    if selected_inc_str == "Select Incident..." or selected_scenario == "Select Scenario...":
         st.warning("⚠️ Please select both an Incident ID and a Scenario before analyzing.")
     else:
+        # Store the active run parameters in session state
+        st.session_state["active_incident_id"] = int(selected_inc_str)
+        st.session_state["active_scenario"] = selected_scenario
+        
+        # Execute analysis and store results
         st.session_state["analysis"] = analyse_scenario(
-            incident_id,
-            scenario,
+            st.session_state["active_incident_id"],
+            st.session_state["active_scenario"],
             k_routes=3
         )
 
-# Clear active analysis if the user resets a dropdown back to "Select..."
-if incident_id is None or scenario is None:
-    st.session_state.pop("analysis", None)
+# 2. Retrieve the parameters that were LAST analyzed (not the ones currently in the dropdown)
+incident_id = st.session_state.get("active_incident_id", None)
+scenario = st.session_state.get("active_scenario", None)
+analysis = st.session_state.get("analysis", None)
+
+# 3. Halt rendering if no analysis has been executed yet
+if analysis is None or incident_id is None or scenario is None:
     st.info("👈 Select an incident and scenario above, then click **Analyse Incident** to view emergency routes.")
     st.stop()
 
-# Safely check if analysis results exist
-analysis = st.session_state.get("analysis", None)
-if analysis is None:
-    st.stop()
-
-# Safe row extraction (around line 927)
+# Safe row extraction for downstream map/metric rendering (line 927)
 matched_incidents = incidents_wgs84[
     incidents_wgs84["incident_id"].astype(str) == str(incident_id)
 ]
