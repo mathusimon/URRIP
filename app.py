@@ -851,41 +851,45 @@ st.markdown(
 
 
 # ------------------------------------------------------------
-# CONTROLS & SESSION STATE
+# CONTROLS & SESSION STATE (PLACEHOLDER SELECTS)
 # ------------------------------------------------------------
 
-incident_ids = sorted(
+# 1. Build Incident list with a default placeholder
+incident_options = ["Select Incident..."] + sorted(
     incidents_wgs84["incident_id"]
     .astype(int)
+    .astype(str)
     .tolist()
 )
+
+# 2. Build Scenario list with a default placeholder
+scenario_options = [
+    "Select Scenario...",
+    "Off-Peak",
+    "Peak Traffic",
+    "Flood + Traffic"
+]
 
 col1, col2, col3 = st.columns([1, 1.5, 1])
 
 with col1:
-    incident_id = st.selectbox(
+    selected_inc_str = st.selectbox(
         "Incident",
-        incident_ids,
-        index=(
-            incident_ids.index(35)
-            if 35 in incident_ids
-            else 0
-        )
+        options=incident_options,
+        index=0,
+        key="selected_incident"
     )
 
 with col2:
-    scenario = st.selectbox(
+    selected_scenario = st.selectbox(
         "Scenario",
-        [
-            "Off-Peak",
-            "Peak Traffic",
-            "Flood + Traffic"
-        ],
-        index=2
+        options=scenario_options,
+        index=0,
+        key="selected_scenario"
     )
 
 with col3:
-    st.write("") # Spacer to align button vertically with selectboxes
+    st.write("") # Alignment spacer
     st.write("")
     analyse = st.button(
         "Analyse Incident",
@@ -893,19 +897,23 @@ with col3:
         use_container_width=True
     )
 
-# Run analysis ONLY when the button is pressed
+# 3. Handle analysis execution on button click
 if analyse:
-    st.session_state["analysis"] = analyse_scenario(
-        int(incident_id),
-        scenario,
-        k_routes=3
-    )
+    # Check if user forgot to pick a valid option
+    if selected_inc_str == "Select Incident..." or selected_scenario == "Select Scenario...":
+        st.warning("⚠️ Please select both an Incident ID and a Scenario before analyzing.")
+    else:
+        st.session_state["analysis"] = analyse_scenario(
+            int(selected_inc_str),
+            selected_scenario,
+            k_routes=3
+        )
 
-# Retrieve results from session state
+# 4. Display results or standard placeholder message
 analysis = st.session_state.get("analysis", None)
 
 if analysis is None:
-    st.info("👈 Select an incident and scenario, then click **Analyse Incident** to compute emergency routes.")
+    st.info("👈 Select an incident and scenario above, then click **Analyse Incident** to view emergency routes.")
     st.stop()
 
 
