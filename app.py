@@ -897,7 +897,7 @@ with col3:
         use_container_width=True
     )
 
-# Assign variables expected by downstream code (line 1013, maps, metrics, etc.)
+# Assign variables safely
 incident_id = int(selected_inc_str) if selected_inc_str != "Select Incident..." else None
 scenario = selected_scenario if selected_scenario != "Select Scenario..." else None
 
@@ -912,12 +912,27 @@ if analyse:
             k_routes=3
         )
 
-# Retrieve results from session state
-analysis = st.session_state.get("analysis", None)
-
-if analysis is None:
+# Clear active analysis if the user resets a dropdown back to "Select..."
+if incident_id is None or scenario is None:
+    st.session_state.pop("analysis", None)
     st.info("👈 Select an incident and scenario above, then click **Analyse Incident** to view emergency routes.")
     st.stop()
+
+# Safely check if analysis results exist
+analysis = st.session_state.get("analysis", None)
+if analysis is None:
+    st.stop()
+
+# Safe row extraction (around line 927)
+matched_incidents = incidents_wgs84[
+    incidents_wgs84["incident_id"].astype(str) == str(incident_id)
+]
+
+if matched_incidents.empty:
+    st.error(f"Incident ID {incident_id} was not found in the dataset.")
+    st.stop()
+
+incident_row = matched_incidents.iloc[0]
 
 
 # ------------------------------------------------------------
