@@ -1354,42 +1354,6 @@ with st.container(border=True):
     st.success(f"**{recommendation}**")
     st.caption("The system evaluates travel time together with network conditions and, under the flood scenario, route-level flood exposure.")
 
-#st.markdown(
-#    f"""
-#    <div style="
-#        padding:16px 18px;
-#        margin-top:14px;
- #       border-radius:8px;
- #       background:{rec_color}14;
- #       border-left:4px solid {rec_color};">
-
- #       <h3 style="
-  #          margin:0 0 6px 0;
- #           color:{TEXT_DARK};">
-  #          📡 Operational Recommendation
- #       </h3>
-
-  #      <p style="
-   #         margin:0 0 6px 0;
-   #         font-size:16px;
-     #       font-weight:700;
-    #        color:{rec_color};">
-       #     {recommendation}
-     #   </p>
-
-      #  <p style="
-      #      margin:0;
-      #      color:{MUTED};
-       #     font-size:13px;">
-       #     The system evaluates travel time together with network
-       #     conditions and, under the flood scenario, route-level
-        #    flood exposure.
-      #  </p>
-   # </div>
- #   """,
- #   unsafe_allow_html=True
-#)
-
 
 # ------------------------------------------------------------
 # FACILITY RANKING
