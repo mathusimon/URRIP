@@ -457,6 +457,46 @@ def route_recommendation(
 
     return "CAUTION: ALL ALTERNATIVE ROUTES ARE HEAVILY FLOOD-EXPOSED"
 
+# ------------------------------------------------------------
+# OPERATIONAL GUIDANCE FUNCTIONS
+# ------------------------------------------------------------
+
+def get_operational_action(scenario, routes_df):
+    """Tactical command action based on environmental risk level."""
+    if routes_df.empty:
+        return "RED ALERT: Suspend immediate ground dispatch. Initiate aerial/marine reconnaissance."
+
+    max_flood = routes_df["flood_percentage"].max() if "flood_percentage" in routes_df.columns else 0
+
+    if scenario == "Flood + Traffic" and max_flood > 50:
+        return "HIGH RISK DISPATCH: Alert field units of active inundation. Require high-clearance response vehicles."
+    elif scenario == "Peak Traffic":
+        return "PRIORITY DISPATCH: Notify traffic control center to clear critical intersections along corridor."
+    else:
+        return "STANDARD DISPATCH: Mobilize primary unit under normal emergency response protocols."
+
+
+def get_operational_recommendation(scenario, routes_df):
+    """Spatial and routing recommendation naming exact target routes."""
+    if routes_df.empty:
+        return "NO VIABLE ROUTE IDENTIFIED"
+
+    best_route = int(routes_df.iloc[0]["route_number"])
+    
+    if scenario != "Flood + Traffic":
+        return f"Primary Routing: Proceed via Route {best_route} (Optimal Travel Time)"
+
+    # Handle flood evaluation logic
+    viable_routes = routes_df[routes_df["flood_percentage"] <= 20]
+
+    if not viable_routes.empty:
+        recommended_route = int(viable_routes.iloc[0]["route_number"])
+        if recommended_route == 1:
+            return f"Primary Routing: Proceed via Route {recommended_route} (Minimal Flood Exposure)"
+        return f"Tactical Reroute: Bypass Primary Corridor; proceed via Route {recommended_route}"
+    
+    return f"Cautionary Routing: Proceed via Route {best_route} with extreme caution (High Flood Exposure)"
+
 
 # ------------------------------------------------------------
 # SCENARIO ANALYSIS
