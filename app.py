@@ -898,13 +898,17 @@ with col3:
     )
 
 # 3. Handle analysis execution on button click
+# 3. Handle analysis execution on button click
 if analyse:
     # Check if user forgot to pick a valid option
     if selected_inc_str == "Select Incident..." or selected_scenario == "Select Scenario...":
         st.warning("⚠️ Please select both an Incident ID and a Scenario before analyzing.")
     else:
+        # Convert selected string to integer incident_id
+        incident_id = int(selected_inc_str)
+        
         st.session_state["analysis"] = analyse_scenario(
-            int(selected_inc_str),
+            incident_id,
             selected_scenario,
             k_routes=3
         )
