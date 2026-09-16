@@ -851,10 +851,10 @@ st.markdown(
 
 
 # ------------------------------------------------------------
-# CONTROLS & SESSION STATE (PLACEHOLDER SELECTS)
+# CONTROLS & SESSION STATE
 # ------------------------------------------------------------
 
-# 1. Build Incident list with a default placeholder
+# Build Incident list with a placeholder
 incident_options = ["Select Incident..."] + sorted(
     incidents_wgs84["incident_id"]
     .astype(int)
@@ -862,7 +862,7 @@ incident_options = ["Select Incident..."] + sorted(
     .tolist()
 )
 
-# 2. Build Scenario list with a default placeholder
+# Build Scenario list with a placeholder
 scenario_options = [
     "Select Scenario...",
     "Off-Peak",
@@ -897,23 +897,22 @@ with col3:
         use_container_width=True
     )
 
-# 3. Handle analysis execution on button click
-# 3. Handle analysis execution on button click
+# Assign variables expected by downstream code (line 1013, maps, metrics, etc.)
+incident_id = int(selected_inc_str) if selected_inc_str != "Select Incident..." else None
+scenario = selected_scenario if selected_scenario != "Select Scenario..." else None
+
+# Handle analysis execution on button press
 if analyse:
-    # Check if user forgot to pick a valid option
-    if selected_inc_str == "Select Incident..." or selected_scenario == "Select Scenario...":
+    if incident_id is None or scenario is None:
         st.warning("⚠️ Please select both an Incident ID and a Scenario before analyzing.")
     else:
-        # Convert selected string to integer incident_id
-        incident_id = int(selected_inc_str)
-        
         st.session_state["analysis"] = analyse_scenario(
             incident_id,
-            selected_scenario,
+            scenario,
             k_routes=3
         )
 
-# 4. Display results or standard placeholder message
+# Retrieve results from session state
 analysis = st.session_state.get("analysis", None)
 
 if analysis is None:
