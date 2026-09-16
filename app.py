@@ -1349,7 +1349,7 @@ st.dataframe(
 # ------------------------------------------------------------
 # OPERATIONAL RECOMMENDATION
 # ------------------------------------------------------------
-
+import textwrap
 st.markdown(
     f"""
     <div style="
