@@ -1412,13 +1412,22 @@ st.dataframe(
 
 
 # ------------------------------------------------------------
-# OPERATIONAL RECOMMENDATION
+# DISPLAY OPERATIONAL OUTPUTS
 # ------------------------------------------------------------
-with st.container(border=True):
-    st.subheader("📡 Operational Recommendation")
-    st.success(f"**{recommendation}**")
-    st.caption("The system evaluates travel time together with network conditions and, under the flood scenario, route-level flood exposure.")
 
+# Extract distinct actions and recommendations from analysis results
+op_action = get_operational_action(scenario, analysis["routes"])
+op_recommendation = get_operational_recommendation(scenario, analysis["routes"])
+
+col_act, col_rec = st.columns(2)
+
+with col_act:
+    st.subheader("⚡ Operational Action")
+    st.info(op_action)
+
+with col_rec:
+    st.subheader("🗺️ Operational Recommendation")
+    st.success(op_recommendation)
 
 # ------------------------------------------------------------
 # FACILITY RANKING
