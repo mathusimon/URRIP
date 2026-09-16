@@ -1419,7 +1419,7 @@ st.dataframe(
 op_recommendation = get_operational_recommendation(scenario, analysis["routes"])
 (col_act,) = st.columns([1])
 
-with col_rec:
+with col_act:
     st.subheader("🗺️ Operational Recommendation")
     st.success(op_recommendation)
 
