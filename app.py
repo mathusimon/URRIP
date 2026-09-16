@@ -1421,10 +1421,6 @@ op_recommendation = get_operational_recommendation(scenario, analysis["routes"])
 
 col_act, col_rec = st.columns(2)
 
-with col_act:
-    st.subheader("⚡ Operational Action")
-    st.info(op_action)
-
 with col_rec:
     st.subheader("🗺️ Operational Recommendation")
     st.success(op_recommendation)
